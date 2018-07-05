@@ -16,7 +16,7 @@ install-deps:
 	go get -u github.com/darrylwest/cassava-logger/logger
 
 format:
-	( gofmt -s -w src/*.go src/$(PACKAGE)/*.go test/*/*.go )
+	( gofmt -s -w src/*.go src/*/*.go test/*/*.go )
 
 lint:
 	@( golint src/... && golint test/... )

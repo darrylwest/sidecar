@@ -32,7 +32,7 @@ func NewDefaultConfig() *Config {
 	cfg.Port = 8001
 	cfg.LogLevel = 3
 	cfg.LoopSeconds = 10
-	cfg.Home = path.Join(os.Getenv("HOME"), "TestAutomation", "bolt")
+	cfg.Home = "/opt/"
 
 	return cfg
 }

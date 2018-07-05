@@ -8,8 +8,8 @@
 package unit
 
 import (
-	"fmt"
 	"app"
+	"fmt"
 	"testing"
 
 	. "github.com/franela/goblin"
