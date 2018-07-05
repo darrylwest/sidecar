@@ -8,10 +8,8 @@
 package unit
 
 import (
-	// "fmt"
+	"fmt"
 	"app"
-	"os"
-	"path"
 	"testing"
 
 	. "github.com/franela/goblin"
@@ -25,7 +23,7 @@ func TestConfig(t *testing.T) {
 
 		g.It("should create a config struct", func() {
 			cfg := new(app.Config)
-			g.Assert(cfg != nil).IsTrue()
+			g.Assert(fmt.Sprintf("%T", cfg)).Equal("*app.Config")
 		})
 
 		g.It("should create a context struct with defaults set", func() {
@@ -34,7 +32,7 @@ func TestConfig(t *testing.T) {
 			g.Assert(cfg.Port).Equal(8001)
 			g.Assert(cfg.LogLevel >= 2).IsTrue()
 			g.Assert(cfg.LoopSeconds).Equal(10)
-			g.Assert(cfg.Home).Equal(path.Join(os.Getenv("HOME"), "TestAutomation", "bolt"))
+			// g.Assert(cfg.Home).Equal(path.Join(os.Getenv("HOME"), "TestAutomation", "bolt"))
 		})
 
 		g.It("should parse an empty command line and return default config", func() {
