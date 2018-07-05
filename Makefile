@@ -26,7 +26,7 @@ test:
 	@( make lint )
 
 run:
-	go run src/main.go --service router
+	go run src/main.go
 
 watch:
 	go-watcher --loglevel 3

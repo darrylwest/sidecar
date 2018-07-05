@@ -82,7 +82,9 @@ func (svc Service) runEventLoop(stop chan bool) error {
 				count = svc.cfg.LoopSeconds
 
 				// invoke the loop processor
-				svc.client.ProcessLoop(docker)
+                if svc.client != nil {
+                    svc.client.ProcessLoop(docker)
+                }
 			}
 
 			count--
