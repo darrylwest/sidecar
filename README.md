@@ -1,4 +1,4 @@
-# Test Hub Sidecar
+# Sidecar Support Application
 
 ```         
    _____ _     __     ______                   
@@ -14,20 +14,23 @@ Sidecar is a stand-alone utility...
 
 ## Sidecar Responsibilities
 
+Start/stop/restart containers.  Usually runs as a service from systemd on coreos.
+
 ### Primary Responsibilities
 
+* read container configuration
+* insure that containers meet config
+* repeat
 
 ### Secondary Responsibilities
 
+* clean logs
+* bounce containers
+* rolling updates
 
 ## Installation
 
-## Use
-
-To view the CLI / options...
-
-`sidecar --help`
-
+### Systemd Service File
 
 ###### darryl.west | 2018.07.05
 
