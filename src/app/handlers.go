@@ -2,54 +2,121 @@
 // handlers - methods to handle requests
 //
 // @author darryl.west <darwest@ebay.com>
-// @created 2017-07-21 08:35:20
+// @created 2018-05-09 08:35:20
 //
 
 package app
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
-	// "strings"
+	"time"
+
+	"github.com/go-zoo/bone"
 )
 
 // Handlers the handlers struct for configuration
 type Handlers struct {
-	cfg *Config
+	cfg       *Config
 }
 
 // NewHandlers create the new handlers object
-func NewHandlers(config *Config) *Handlers {
-	hnd := Handlers{config}
+func NewHandlers(cfg *Config) *Handlers {
+	hnd := &Handlers{}
+	hnd.cfg = cfg
 
-	return &hnd
+	return hnd
 }
 
-func (hnd *Handlers) homeHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintf(w, "{\"%s\":\"%s\"}\n\r", "sidecar", "ok")
+// HomeHandler closure that returns the home page
+func (hnd *Handlers) HomeHandler() http.HandlerFunc {
+	log.Info("home page handler...")
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		blob := GetStatusAsJSON(hnd.cfg)
+
+		log.Info("status: %s", blob)
+
+		log.Info(blob)
+		fmt.Fprintf(w, "%s\n\r", blob)
+	}
 }
 
-func (hnd *Handlers) statusHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	json := GetStatusAsJSON(hnd.cfg)
-	log.Info(json)
-	fmt.Fprintf(w, "%s\n\r", json)
+// StatusHandler closure that returns the service status
+func (hnd *Handlers) StatusHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		blob := GetStatusAsJSON(hnd.cfg)
+
+		log.Info("status: %s", blob)
+
+		log.Info(blob)
+		fmt.Fprintf(w, "%s\n\r", blob)
+	}
 }
 
-// log level handlers Get: /logger -> show level; Put: /logger/n set level to n
-func (hnd *Handlers) getLogLevel(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintf(w, "{\"%s\":\"%d\"}\n\r", "loglevel", log.GetLevel())
+// GetLogLevel returns the current log level
+func (hnd *Handlers) GetLogLevel() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "{\"%s\":\"%d\"}\n\r", "loglevel", log.GetLevel())
+	}
 }
 
-// set the log level
-func (hnd *Handlers) setLogLevel(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	level, err := strconv.Atoi(ps.ByName("level"))
-	if err == nil && level > 0 && level < 5 {
+// SetLogLevel returns the current log level
+func (hnd *Handlers) SetLogLevel() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := bone.GetValue(r, "level")
+		if value == "" {
+			hnd.writeErrorResponse(w, "must supply a level between 0 and 5")
+			return
+		}
+
+		level, err := strconv.Atoi(value)
+		if err != nil {
+			log.Warn("attempt to set log level to invalid value: %s, ignored...", level)
+			hnd.writeErrorResponse(w, err.Error())
+			return
+		}
+
+		if level < 0 {
+			level = 0
+		}
+
+		if level > 5 {
+			level = 5
+		}
+
 		log.SetLevel(level)
-	} else {
-		log.Warn("attempt to set log level to invalid value: %s, ignored...", level)
+
+		fmt.Fprintf(w, "{\"%s\":\"%d\"}\n\r", "loglevel", log.GetLevel())
+	}
+}
+
+// CreateResponseWrapper cxreate a map
+func (hnd Handlers) CreateResponseWrapper(status string) map[string]interface{} {
+	wrapper := make(map[string]interface{})
+	wrapper["status"] = status
+	wrapper["version"] = "1.0"
+	wrapper["ts"] = time.Now()
+
+	return wrapper
+}
+
+func (hnd Handlers) writeJSONBlob(w http.ResponseWriter, wrapper map[string]interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	blob, err := json.Marshal(wrapper)
+	if err != nil {
+		log.Error(err.Error())
+		http.Error(w, err.Error(), 501)
+		return
 	}
 
-	fmt.Fprintf(w, "{\"%s\":\"%d\"}\n\r", "loglevel", log.GetLevel())
+	log.Debug("blob: %s", blob)
+	fmt.Fprintf(w, "%s\n\r", blob)
+}
+
+func (hnd Handlers) writeErrorResponse(w http.ResponseWriter, str string) {
+	log.Warn(str)
+	http.Error(w, str, 501)
 }

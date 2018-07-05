@@ -8,8 +8,8 @@
 package unit
 
 import (
-	"fmt"
 	"app"
+	"fmt"
 	"testing"
 
 	. "github.com/franela/goblin"
@@ -29,7 +29,7 @@ func TestConfig(t *testing.T) {
 		g.It("should create a context struct with defaults set", func() {
 			cfg := app.NewDefaultConfig()
 			g.Assert(cfg != nil).IsTrue()
-			g.Assert(cfg.Port).Equal(8001)
+			g.Assert(cfg.Port).Equal(4041)
 			g.Assert(cfg.LogLevel >= 2).IsTrue()
 			g.Assert(cfg.LoopSeconds).Equal(10)
 			// g.Assert(cfg.Home).Equal(path.Join(os.Getenv("HOME"), "TestAutomation", "bolt"))

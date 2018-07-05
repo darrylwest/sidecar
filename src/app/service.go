@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/go-zoo/bone"
 )
 
 // Client interface for generic sidecar clients
@@ -82,9 +82,9 @@ func (svc Service) runEventLoop(stop chan bool) error {
 				count = svc.cfg.LoopSeconds
 
 				// invoke the loop processor
-                if svc.client != nil {
-                    svc.client.ProcessLoop(docker)
-                }
+				if svc.client != nil {
+					svc.client.ProcessLoop(docker)
+				}
 			}
 
 			count--
@@ -101,11 +101,11 @@ func (svc Service) startServer() {
 	hnd := svc.handlers
 
 	log.Info("configure the router/handler...")
-	router := httprouter.New()
-	router.GET("/", hnd.homeHandler)
-	router.GET("/status", hnd.statusHandler)
-	router.GET("/logger", hnd.getLogLevel)
-	router.PUT("/logger/:level", hnd.setLogLevel)
+	router := bone.New()
+	router.GetFunc("/", hnd.HomeHandler())
+	router.GetFunc("/status", hnd.StatusHandler())
+	router.GetFunc("/logger", hnd.GetLogLevel())
+	router.PutFunc("/logger/:level", hnd.SetLogLevel())
 
 	host := fmt.Sprintf(":%d", cfg.Port)
 	log.Info("start listening on port %s", host)

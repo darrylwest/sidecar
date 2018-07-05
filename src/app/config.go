@@ -25,8 +25,8 @@ type Config struct {
 func NewDefaultConfig() *Config {
 	cfg := new(Config)
 
-	cfg.Port = 8001
-	cfg.LogLevel = 3
+	cfg.Port = 4041
+	cfg.LogLevel = 2
 	cfg.LoopSeconds = 10
 	cfg.Home = "/opt/"
 
