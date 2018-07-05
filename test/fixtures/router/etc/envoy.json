@@ -1,0 +1,237 @@
+{
+  "listeners": [
+    {
+      "address": "tcp://0.0.0.0:80",
+      "filters": [
+        {
+          "type": "read",
+          "name": "http_connection_manager",
+          "config": {
+            "codec_type": "auto",
+            "stat_prefix": "ingress_http",
+            "access_log":[
+              {
+                "path":"/dev/stdout"
+              }
+            ],
+            "route_config": {
+              "virtual_hosts": [
+                {
+                  "name": "service-router",
+                  "domains": ["*.close5.com"],
+                  "routes": [
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/v2/following",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "path": "/follow",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/conversations",
+                      "cluster": "chat",
+                      "case_sensitive": false
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/v2/conversations",
+                      "cluster": "chatv2"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/bulletins",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/users/block",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/v2/followers",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/users/verify/email",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/users/state",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/users/items/grouped",
+                      "cluster": "search"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "path": "/users/*/verify/email",
+                      "cluster": "search"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/users/bulkEmailReceiptStatus",
+                      "cluster": "user",
+                      "case_sensitive": false
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/recommendations/",
+                      "cluster": "recommendations"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/devices",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/facebook",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/user-service",
+                      "cluster": "user"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/tokens",
+                      "cluster": "sessions"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/v2/items/search",
+                      "cluster": "search"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/search",
+                      "cluster": "search"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "path": "/users/healthcheck-8675309",
+                      "cluster": "user"
+                    },
+                    {
+                        "timeout_ms": 0,
+                        "path": "/healthcheck-8675309",
+                        "cluster": "chatv2"
+                    },
+                    {
+                      "timeout_ms": 0,
+                      "prefix": "/",
+                      "cluster": "core-api"
+                    }
+                  ]
+                }
+              ]
+            },
+            "filters": [
+              {
+                "type": "decoder",
+                "name": "router",
+                "config": {}
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "admin": {
+    "access_log_path": "/dev/null",
+    "address": "tcp://0.0.0.0:8001"
+  },
+  "cluster_manager": {
+    "clusters": [
+      {
+        "name": "user",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://staging-user.us-west-1.elasticbeanstalk.com:80"
+          }
+        ]
+      },
+      {
+        "name": "chat",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://staging-chat.us-west-1.elasticbeanstalk.com:80"
+          }
+        ]
+      },
+      {
+        "name": "chatv2",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://chris-chat2.us-west-1.elasticbeanstalk.com:80"
+          }
+        ]
+      },
+      {
+        "name": "recommendations",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://staging-recs.us-west-1.elasticbeanstalk.com:80"
+          }
+        ]
+      },
+      {
+        "name": "search",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://search-staging.us-west-1.elasticbeanstalk.com:80"
+          }
+        ]
+      },
+      {
+        "name": "sessions",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://staging-sessions.us-west-1.elasticbeanstalk.com:80"
+          }
+        ]
+      },
+      {
+        "name": "core-api",
+        "connect_timeout_ms": 250,
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "hosts": [
+          {
+            "url": "tcp://staging-pgtiepi5f2.elasticbeanstalk.com:80"
+          }
+        ]
+      }
+    ]
+  }
+}
+
