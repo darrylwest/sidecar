@@ -74,7 +74,7 @@ func (hnd *Handlers) SetLogLevel() http.HandlerFunc {
 
 		level, err := strconv.Atoi(value)
 		if err != nil {
-			log.Warn("attempt to set log level to invalid value: %s, ignored...", level)
+			log.Warn("attempt to set log level to invalid value: %d, ignored...", level)
 			hnd.writeErrorResponse(w, err.Error())
 			return
 		}
